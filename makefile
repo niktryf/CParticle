@@ -1,8 +1,8 @@
-### Variables
+### Compiler & flags
 CC=gcc
 CFLAGS=-c
 
-### Dirs
+### Directories
 SRC_DIR=src
 OBJ_DIR=obj
 HEAD_DIR=headers
@@ -12,13 +12,11 @@ EXEC=cparticle
 
 ### Sources (in src directory)
 SOURCES=$(addprefix $(SRC_DIR)/, \
-	main.c io.c memory.c motion.c)
-#	setup.c interpolate.c poisson.c \
-#	fields.c mover.c wrappers.c)
+	main.c io.c memory.c motion.c \
+	fields.c solver.c)
 
 ### Objects (in obj directory)
 OBJECTS=$(SOURCES:$(SRC_DIR)%.c=$(OBJ_DIR)%.o)
-
 
 ### Rules: #######################################
 

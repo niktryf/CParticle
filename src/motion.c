@@ -6,43 +6,34 @@
 
 #include "../headers/struct.h"
 #include "../headers/definitions.h"
+#include "../headers/solver.h"
+#include "../headers/io.h"
 
-double **motion(double **array2D, struct particle p, struct time t)
+
+/* Calculates the kinetic energy of the particle, 
+   which is conserved for motion in a magnetic field.
+ */
+double kineticEnergy(struct particle p)
 {
-    int i, j, k;
+    return p.v.x*p.v.x + p.v.y*p.v.y + p.v.z*p.v.z;
+}
 
-
-
-
+double **motion(double **output, struct particle p, struct time t)
+{
+    int i, j;
+    double tt;
 
     /*** Solve DEs ***/
     for(i=0;i<t.nOutput;i++) {
         /* Write to output array */
-        // Positions:
-        array2D[i][0] = p.r.x;
-        array2D[i][1] = p.r.y;
-        array2D[i][2] = p.r.z;
-        // Velocities:
-        array2D[i][3] = p.v.x;
-        array2D[i][4] = p.v.y;
-        array2D[i][5] = p.v.z;
+        output = writeToArray(output, i, p, kineticEnergy(p));
         
         /* Call Runge - Kutta for nSteps_Output steps */
-        for(j=1;j<=t.output_interval;j++) {
-            //t = (i*(t.output_interval) + j)*dt;
-            //p = RK4_2nd (p, dt, t);
+        for(j=0;j<t.output_interval;j++) {
+            tt = (i*(t.output_interval) + j)*t.dt;
+            p = RK4_motion3D (p, t.dt, tt);
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-    return array2D;
+    return output;
 }

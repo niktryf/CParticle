@@ -103,3 +103,49 @@ void printInput (struct particle p, struct time t)
     printf("##################################################################\n");
 }
 
+/* Writes particle data (r, v) to output array */
+double **writeToArray(double **outputArray, int n, struct particle p, double energy) 
+{
+    // Positions:
+    outputArray[n][0] = p.r.x;
+    outputArray[n][1] = p.r.y;
+    outputArray[n][2] = p.r.z;
+    // Velocities:
+    outputArray[n][3] = p.v.x;
+    outputArray[n][4] = p.v.y;
+    outputArray[n][5] = p.v.z;
+
+    // Kinetic Energy:
+    outputArray[n][6] = energy;
+
+    return outputArray;
+}
+/* Writes output array to file 
+   First Column: time
+   Next 3 Columns: position (x, y, z)
+   Next 3 Columns: velocity (x, y, z)
+   Last column: kinetic energy
+*/
+void writeFileOutput (double **outputArray, struct time t, char *filename) 
+{
+    int i, j;
+    double tt;
+    FILE *outputFile;
+
+    /* Open Output File */
+    outputFile = fopen(filename, "w");
+
+    /* Write Output */
+    for(i=0; i<t.nOutput; i++) {
+        tt = i*(t.output_interval)*t.dt;
+        fprintf(outputFile, "%f\t", tt);
+        for(j=0; j<2*N; j++) {
+            fprintf(outputFile, "%f\t", outputArray[i][j]);
+        }
+        fprintf(outputFile, "%.12f\t", outputArray[i][2*N]); 
+        fprintf(outputFile, "\n");
+    }
+
+    /* Close Output File */
+    fclose(outputFile);
+}
