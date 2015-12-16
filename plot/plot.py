@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #############################################################################
+### Function to be called from external script!
 ### Plots given t, x, v: x-t, v-t, v-x
 #############################################################################
 def plot1D (t, x, v):

@@ -1,0 +1,129 @@
+********************************************************************
+********    CParticle: A charged particle                   ********
+********               trajectory solver in C               ********
+********                                                    ********
+********    Author: Nikos Tryfonidis                        ********
+********    The MIT License (MIT)                           ********
+********    Copyright (c) 2015 Nikos Tryfonidis             ********
+********    See LICENSE.txt                                 ********
+********                                                    ********
+********************************************************************
+
+Contents:
+            i. Introduction
+            ii. Compilation
+            iii. Structure
+            iv. Usage
+            v. Output
+            vi. Visualization
+
+
+--------------------------------------------------------------------
+i. Introduction:
+--------------------------------------------------------------------
+CParticle is a charged particle trajectory simulation code, written 
+in C. The code simulates charged particle motion in electromagnetic 
+fields given by the user in Cartesian coordinates. 
+
+It provides output for position (x, y, z) and velocity 
+(v_x, v_y, v_z). Kinetic energy is also provided, for testing 
+purposes.
+
+
+--------------------------------------------------------------------
+ii. Compilation
+--------------------------------------------------------------------
+CParticle is written in C and does not use any external libraries. It 
+should compile in any linux system with a C compiler.
+To compile, use the makefile provided and simply type "make".
+
+--------------------------------------------------------------------
+iii. Structure
+--------------------------------------------------------------------
+Directories:
+            - src:      source files (the actual C code)
+            - headers: .h files used as headers
+            - obj:      directory for .o files
+            - analysis: python scripts for visualizing results
+
+--------------------------------------------------------------------
+iv. Usage
+--------------------------------------------------------------------
+The program reads the following input:
+
+1. Initial conditions of the particle from the input file 
+   "input.txt", in the main directory (same as the executable).
+    The user simply has to provide 3 space-separated values for
+    the initial position and velocity (starting with the letter r and
+    v respectively). 
+
+    For example, if we want the following initial conditions:
+    x = 0, y = 0, z = 0
+    v_x = 1, v_y = 1, v_z = 1
+
+    Then the input file should be:
+    r 0.0 0.0 0.0
+    v 1.0 1.0 1.0
+
+2. Charge type and time parameters as command line arguments, 
+   in the following form:
+
+$ ./cparticle <charge type (i or e)> <total time> <timestep> <output interval>
+        
+   So, if we want to simulate the motion of an electron for 100 time units, 
+   with a timestep of dt = 0.001 and we want output every 10 steps, we enter:
+
+   $ ./cparticle e 100 0.001 10 
+
+Setting the desired electromagnetic fields is something the user 
+will definitely want to do, and this can be done by writing the appropriate 
+fields inside the "src/fields.c" source file. Functions "EField" and 
+"BField" return the Electric and Magnetic fields as 3D vectors, respectively.
+
+Last, certain "standard practise" definitions have been made, regarding the 
+mass and charge of the ion/electron particles. These can be changed, 
+if desired, from the "headers/definitions.h" header file.
+
+--------------------------------------------------------------------
+v. Output
+--------------------------------------------------------------------
+CParticle produces its main output as ASCII files, containing columns
+of data. The following output files are written, inside the "output" 
+directory:
+
+        1. output.txt : Contains the time, 3 position components 
+                        and 3 velocity components in respective 
+                        columns:
+            t     x     y      z      v_x     v_y     v_z
+
+        2. energy.txt : Contains the kinetic energy of the particle
+                        for every output time step.
+
+--------------------------------------------------------------------
+vi. Visualization
+--------------------------------------------------------------------
+Python scripts that visualize the results have been written inside 
+the "plot" directory. These use NumPy and matplotlib to create the 
+plots and animation.
+
+The user can do the following visualizations 
+from inside the "plot" directory:
+
+        1. Plot x(t)-t , v_x(t)-t, v(t)-x(t) plots and 3D trajectory:
+
+           $ python plot_xyz
+
+            This creates the x(t)-t , v_x(t)-t , v(t)-x(t) plots and 
+            a 3D trajectory plot when the previous two figures are 
+            closed.
+            The user can choose to plot x, y, z coordinates from within 
+            the plot_xyz.py python script.
+
+        2. Animate the trajectory of the particle:
+
+            $ python animate.py
+
+            This creates a 3D animation of the particle trajectory, 
+            using the matplotlib "animation" package.
+
+

@@ -1,4 +1,5 @@
 # Ignore backup files
 *.*~
+*~
 makefile~
 cparticle

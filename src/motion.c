@@ -2,7 +2,11 @@
  *** CParticle - Charged Particle Motion in ElectroMagnetic Fields.
  *** Particle trajectory wrapper - returns output array
  *** 
- ******************************************************************/
+ *** Author: Nikos Tryfonidis, November 2015
+ *** The MIT License (MIT)
+ *** Copyright (c) 2015 Nikos Tryfonidis
+ *** See LICENSE.txt
+ *******************************************************************/
 
 #include <math.h>
 

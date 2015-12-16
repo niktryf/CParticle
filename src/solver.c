@@ -2,7 +2,11 @@
  *** CParticle - Charged Particle Motion in ElectroMagnetic Fields.
  *** Numerical solution for the equations of motion.
  *** 
- ******************************************************************/
+ *** Author: Nikos Tryfonidis, November 2015
+ *** The MIT License (MIT)
+ *** Copyright (c) 2015 Nikos Tryfonidis
+ *** See LICENSE.txt
+ *******************************************************************/
 
 #include "../headers/struct.h"
 #include "../headers/fields.h"

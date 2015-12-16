@@ -1,8 +1,18 @@
-#idea: read output file here. 
-#pass time, space and velocity to plot1D, and that shows its plots.
-#then, we read and plot energy from here
-#and finally we do a 3D trajectory plot.
-#animation comes later.
+#############################################################################
+### Python script for plotting 1D data (x,y) for particle trajectory codes.
+###   Data is read from given file.
+###   Plot is created using matplotlib.
+###   Produces the following plots:
+###   1. (x(t) - t), (v(t) - t), 
+###   2. (v(t) - x(t))
+###   3. 3D Plot of trajectory
+###
+###   Author: Nikos Tryfonidis
+###   The MIT License (MIT)
+###   Copyright (c) 2015 Nikos Tryfonidis
+###   See LICENSE.txt
+#############################################################################
+
 
 import numpy as np
 import matplotlib.pyplot as plt
