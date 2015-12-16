@@ -95,7 +95,7 @@ void cmd_line(int argc, char *argv[], struct particle *p, struct time *t)
 void printInput (struct particle p, struct time t) 
 {
     printf("\n###############    Particle Motion in EM Fields    \
-              ###############\n");
+###############\n");
     printf("# Parameters: \n");
     printf("# \t\tCharge: %f\tMass: %f\n#\n", p.q, p.m);
     printf("# \t\tTotal time: %.2f\ttimestep: %f\n", t.totalTime, t.dt);
