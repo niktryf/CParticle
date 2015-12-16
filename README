@@ -36,6 +36,7 @@ ii. Compilation
 CParticle is written in C and does not use any external libraries. It 
 should compile in any linux system with a C compiler.
 To compile, use the makefile provided and simply type "make".
+See doc
 
 --------------------------------------------------------------------
 iii. Structure
@@ -44,7 +45,9 @@ Directories:
             - src:      source files (the actual C code)
             - headers: .h files used as headers
             - obj:      directory for .o files
-            - analysis: python scripts for visualizing results
+            - plot:     python scripts for visualizing results
+            - output:   output files are written here
+            - doc:      result samples, description
 
 --------------------------------------------------------------------
 iv. Usage
