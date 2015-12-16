@@ -43,9 +43,9 @@ struct vector3D BField (struct vector3D r, double t)
 {
   struct vector3D B;
 
-  B.x = 0;
-  B.y = 0;
-  B.z = 1;
+  B.x = -(1.0/pow(sqrt(r.x*r.x+r.y*r.y+r.z*r.z),5))*3*r.x*r.z;
+  B.y = -(1.0/pow(sqrt(r.x*r.x+r.y*r.y+r.z*r.z),5))*3*r.y*r.z;
+  B.z = -(1.0/pow(sqrt(r.x*r.x+r.y*r.y+r.z*r.z),5))*(2*r.z*r.z-r.x*r.x-r.y*r.y);
 
   return B;
 }
