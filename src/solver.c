@@ -21,10 +21,13 @@ struct vector3D RHS(struct particle p, double t)
   return F;
 }
 
-
+/*  
+    Runge Kutta (4th Order), for the solution of the equations of motion.
+    2nd order ODE (Newton's formalism) is split into 2 1st order ODEs.
+*/
 struct particle RK4_motion3D(struct particle p, double dt, double t)
 {
-    struct vector3D F, G, k[4], l[4];
+    struct vector3D F, k[4], l[4];
     struct particle tmp;
 
     // Stage 1

@@ -1,6 +1,6 @@
 /******************************************************************
  *** CParticle - Charged Particle Motion in ElectroMagnetic Fields.
- *** File Input/Output Functions.
+ *** Input/Output Functions, for file IO and memory output storage.
  *** 
  ******************************************************************/
 
@@ -34,10 +34,9 @@ struct particle readInitialConditions(char *filename)
         }
     }
   
-  fclose(inputFile);
+    fclose(inputFile);
 
-  return p;
-
+    return p;
 }
 
 /* 
@@ -51,11 +50,11 @@ void cmd_line(int argc, char *argv[], struct particle *p, struct time *t)
 
     /* Check number of arguments */
     if(argc != 5) {
-      // If not enough given, exit:  
-      printf("\nProgram needs 4 command line arguments to run!\n");
-      printf( "Usage: %s (particle type - i or e) (time) (timestep) (step interval for output)\n\n", argv[0] );     
-      printf("\nExiting...\n\n");   
-      exit(-1);
+        // If not enough given, exit:  
+        printf("\nProgram needs 4 command line arguments to run!\n");
+        printf( "Usage: %s (particle type - i or e) (time) (timestep) (step interval for output)\n\n", argv[0] );     
+        printf("\nExiting...\n\n");   
+        exit(-1);
     } 
     else {
         // Get charge (ion or electron)
@@ -92,24 +91,28 @@ void cmd_line(int argc, char *argv[], struct particle *p, struct time *t)
  */
 void printInput (struct particle p, struct time t) 
 {
-    printf("\n###############    Particle Motion in EM Fields    ###############\n");
+    printf("\n###############    Particle Motion in EM Fields    \
+              ###############\n");
     printf("# Parameters: \n");
     printf("# \t\tCharge: %f\tMass: %f\n#\n", p.q, p.m);
     printf("# \t\tTotal time: %.2f\ttimestep: %f\n", t.totalTime, t.dt);
-    printf("# \t\t%d total timesteps, output every %d steps (%d total output)\n#\n", t.totalTimeSteps, t.output_interval, t.nOutput);
+    printf("# \t\t%d total timesteps, output every %d steps\n# \
+\t\t(%d total output)\n#\n", t.totalTimeSteps, t.output_interval, t.nOutput);
     printf("# Initial particle conditions: \n");
     printf("# \t\tinitial r: (%.3f, %.3f, %.3f)\n", p.r.x, p.r.y, p.r.z);
     printf("# \t\tinitial v: (%.3f, %.3f, %.3f)\n", p.v.x, p.v.y, p.v.z);
     printf("##################################################################\n");
 }
 
-/* Writes particle data (r, v) to output array */
-double **writeToArray(double **outputArray, int n, struct particle p, double energy) 
+/* Writes particle data (r, v) and energy to output array */
+double **writeToArray(double **outputArray, int n, 
+                      struct particle p, double energy) 
 {
     // Positions:
     outputArray[n][0] = p.r.x;
     outputArray[n][1] = p.r.y;
     outputArray[n][2] = p.r.z;
+
     // Velocities:
     outputArray[n][3] = p.v.x;
     outputArray[n][4] = p.v.y;
@@ -126,26 +129,31 @@ double **writeToArray(double **outputArray, int n, struct particle p, double ene
    Next 3 Columns: velocity (x, y, z)
    Last column: kinetic energy
 */
-void writeFileOutput (double **outputArray, struct time t, char *filename) 
+void writeFileOutput (double **outputArray, struct time t, 
+                        char *filename_output, char *filename_energy) 
 {
     int i, j;
     double tt;
-    FILE *outputFile;
+    FILE *outputFile, *energyFile;
 
     /* Open Output File */
-    outputFile = fopen(filename, "w");
+    outputFile = fopen(filename_output, "w");
+    energyFile = fopen(filename_energy, "w");
 
     /* Write Output */
     for(i=0; i<t.nOutput; i++) {
         tt = i*(t.output_interval)*t.dt;
         fprintf(outputFile, "%f\t", tt);
+        fprintf(energyFile, "%f\t", tt);
         for(j=0; j<2*N; j++) {
             fprintf(outputFile, "%f\t", outputArray[i][j]);
         }
-        fprintf(outputFile, "%.12f\t", outputArray[i][2*N]); 
         fprintf(outputFile, "\n");
+        fprintf(energyFile, "%.12f\n", outputArray[i][2*N]); 
     }
 
     /* Close Output File */
     fclose(outputFile);
+    fclose(energyFile);
 }
+

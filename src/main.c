@@ -11,35 +11,38 @@
 #include "../headers/io.h"
 #include "../headers/memory.h"
 #include "../headers/motion.h"
-#include "../headers/fields.h"
-#include "../headers/solver.h"
 
 int main(int argc, char *argv[]) {
 
+    // Particle data structure:
     struct particle p;
+    // Time parameters data structure:
     struct time t;
+    // Output storage array:
     double **output;
 
-    /*** Read and show input 
-         (initial conditions from file
-          and charge type - time parameters from command line)
-    ***/
+    /* Read and show input */
+    // Initial position and velocity from input file:
     p = readInitialConditions("input.txt");
+    // Charge type and time parameters from command line:
     cmd_line(argc, argv, &p, &t);
+    // Print input to screen for inspection:
     printInput (p, t);
 
-    /* Allocate memory for output 
-       2D array with position, velocity and energy in columns
-       (2*N + 1 = 7 columns total).
-       Consecutive output (frames) in rows.
-    */
-    output = array2D_contiguous (t.nOutput, 2*N + 1);
+    /* Allocate memory for output */
+    output = array2D_contiguous (t.nOutput, 2*N+1);
 
     /* Begin particle motion */
+    printf("\nRunning...\n");
     output = motion(output, p, t);
-
+    
     /* Write output array */
-    writeFileOutput (output, t, "output/out.txt");
+    printf("\nWriting Output...\n");
+    writeFileOutput (output, t, \
+                     "output/output.txt", \
+                     "output/energy.txt");
+
+    printf("\n...Done!\n");
 
     /* Free output array */
     free_array2D_contiguous(output);

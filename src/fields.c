@@ -61,7 +61,8 @@ struct vector3D cross (struct vector3D A, struct vector3D B)
 }
 
 /* 
-  Gives Lorentz force vector from E, B fields at a point 
+  Calculates Lorentz force vector from E, B fields at a point, 
+  given the particle's position and velocity.
 */
 
 struct vector3D FLorentz (struct particle p, double t)

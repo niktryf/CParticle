@@ -4,6 +4,8 @@
  *** 
  ******************************************************************/
 
+#include <math.h>
+
 #include "../headers/struct.h"
 #include "../headers/definitions.h"
 #include "../headers/solver.h"
@@ -15,13 +17,16 @@
  */
 double kineticEnergy(struct particle p)
 {
-    return p.v.x*p.v.x + p.v.y*p.v.y + p.v.z*p.v.z;
+    return 0.5*p.m*sqrt(p.v.x*p.v.x + p.v.y*p.v.y + p.v.z*p.v.z);
 }
 
+/* Calculates the motion of the particle and writes to 
+   output array in memory.
+ */
 double **motion(double **output, struct particle p, struct time t)
 {
     int i, j;
-    double tt;
+    double tt; //"actual" time, for time-dependent fields.
 
     /*** Solve DEs ***/
     for(i=0;i<t.nOutput;i++) {
