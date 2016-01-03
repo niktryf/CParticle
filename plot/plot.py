@@ -27,14 +27,14 @@ def plot1D (t, x, v):
     # Make (x(t) - t) plot
     plt.subplot(211)
     plt.plot(t, x, linestyle='solid', marker='o', color='black', markersize=3)
-    plt.axis([t[0], t[-1], (min(x)+min(x)/4), max(x)+max(x)/4])
+    plt.axis([t[0], t[-1], min(x), max(x)])
     plt.xlabel('t')
     plt.ylabel('x(t)')
 
     # Make (v_x(t) - t) plot
     plt.subplot(212)
     plt.plot(t, v, color='red')
-    plt.axis([t[0], t[-1], (min(v)+min(v)/4), max(v)+max(v)/4])
+    plt.axis([t[0], t[-1], min(v), max(v)])
     plt.xlabel('t')
     plt.ylabel('v(t)')
 
@@ -44,7 +44,7 @@ def plot1D (t, x, v):
     # Make v(t) - x(t) plot
     plt.figure(2)
     plt.plot(x, v, color='blue')
-    plt.axis([(min(x)+min(x)/4), max(x)+max(x)/4, (min(v)+min(v)/4), max(v)+max(v)/4])
+    plt.axis([(min(x)), max(x), min(v), max(v)])
     plt.grid(True)
     plt.xlabel('x(t)')
     plt.ylabel('v(t)')

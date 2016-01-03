@@ -1,2 +1,7 @@
 animationData.txt
+*.aux
+*.log
+*.gz
+*.mp4
+*.toc
 *~

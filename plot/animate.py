@@ -66,11 +66,11 @@ def animate(i):
 # Start Animation:
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=size, interval=1, blit=True, repeat=False)
 # Show it:
-#plt.show()
+plt.show()
 
 #save animation:
 # Set up formatting for the movie files
-plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
-FFwriter = animation.FFMpegWriter(fps=60, bitrate=1000)
-anim.save('basic_animation.mp4', writer = FFwriter, extra_args=['-vcodec', 'libx264'])
+#plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
+#FFwriter = animation.FFMpegWriter(fps=60, bitrate=1000)
+#anim.save('basic_animation.mp4', writer = FFwriter, extra_args=['-vcodec', 'libx264'])
 

@@ -1,0 +1,212 @@
+\documentclass[11pt]{report}
+\usepackage{amsmath, bm, xcolor, graphicx, listings}
+\usepackage{courier} %for listings
+\usepackage{caption}
+\usepackage{subcaption}
+\lstset{basicstyle=\footnotesize\ttfamily,breaklines=true} %listing font settings
+%\lstset{framextopmargin=50pt} %listing font settings
+\usepackage[english]{babel}
+\setlength\parindent{0pt} %remove indentation in new paragraphs
+
+
+\begin{document}
+\title{\textbf{CParticle}}
+\author{Nikos Tryfonidis}
+\date{2015}
+
+\maketitle
+
+\begin{abstract}
+The current report summarizes the structure, use and results of \emph{CParticle}, a charged particle simulation code written in C. \emph{CParticle} simulates the motion of a charged particle (ion or electron) in electromagnetic fields, that are specified by the user in vector form (Cartesian coordinates). First, a small introduction to the code will be given in chapter 1. Afterwards, the structure of the code will be reviewed in chapter 2. Finally, a number of test cases will be shown, as examples on how to use the code while also verifying its correctness.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introduction}
+CParticle is a three-dimensional charged particle simulation code written in C. The code was written as part of my PhD project, in order to gain insight into the numerical simulation of charged particle motion and eventually to be integrated into a Particle-In-Cell code, as the particle "pusher".
+\newline
+
+In this chapter, a brief introduction to the code will be made, with instructions on how to compile, run and view the simulation results.
+
+\section{Compiling and Running}
+The code should compile without problems on any machine able to compile C code with "make". To compile, simply go to the main directory, where the makefile is located, and type "make". This will build the executable (named "\emph{cparticle}") in the same directory. To run the code, simply run the executable from the command line, providing four (4) arguments:
+
+\begin{lstlisting}
+./cparticle <particle type> <total time> <dt> <output interval>
+\end{lstlisting}
+
+\begin{description}
+\item[particle type] Choose \emph{"i"} for ion (positive charge) or \emph{"e"} for electron (negative charge).
+\item[total time] The total time units for the particle motion to be simulated. 
+\item[dt] The timestep for the numerical solver.
+\item[output interval] Number of steps between output.
+\end{description}
+
+For example, if we want to simulate the motion of an electron for $100$ time units, with a timestep of $0.001$, and want output every 10 timesteps, we will run as:
+
+\begin{lstlisting}
+./cparticle e 100 0.001 10
+\end{lstlisting}
+
+Output is written in the "output" directory, in two ".txt" files:
+
+\begin{description}
+\item[output.txt] Contains output in seven columns. The first column is the time for every output step of the simulation. The next 3 columns are the position of the particle ($x, y, z$). The final 3 columns are the velocity of the particle ($v_x, v_y, v_z$).
+\item[energy.txt] The kinetic energy of the particle for every output step.
+\end{description}
+
+\section{Visualization}
+Visualization of the results is handled with Python scripts that use NumPy and matplotlib, two well-known packages for scientific computing in Python.
+
+These can be easily installed in any Linux system, for example in Ubuntu:
+
+\begin{lstlisting}
+sudo apt-get install python-numpy python-matplotlib
+\end{lstlisting}
+
+The following visualization scripts can be found in the "plot" directory:
+
+\begin{description}
+\item[plot\_xyz.py] Creates the plot of a single chosen coordinate (position, velocity) versus time, and also a 3D plot trajectory of the particle. 
+\item[animate.py] Creates a 3D animation of the particle trajectory.
+\item[plot.py] This script is called by \emph{plot\_xyz.py}. The user does not have to edit or use this directly.
+\end{description}
+
+After running the program, to create the plots, the user can simply go to the \emph{plot} directory and do the following:
+
+\begin{lstlisting}
+python plot_xyz.py
+\end{lstlisting}
+
+This will produce the $x(t)-t$ and $v_x(t)-t$ plots in one figure, and also the phase-space plot $v_x(t) - x(t)$ in another. After the user closes these two figures, the 3D trajectory plot of the particle motion will be created.
+
+To create the animation of the motion, the user can run the \emph{animate.py} script:
+
+\begin{lstlisting}
+python animate.py
+\end{lstlisting}
+
+This will show the animated motion of the particle. If the user wants to save the animation, he should uncomment the last lines in the script (the lines after the comment saying "save animation"), while also commenting out the \emph{"plt.show()"} line. Please note that in order to save the animation, the script uses \emph{ffmpeg}. This has to be installed and be reachable in \emph{/usr/bin/}.
+ 
+\chapter{Code Structure}
+In this chapter, the structure of the code will be briefly reviewed. First, a description of the source files and code will be given, followed by a description of the data structures used. Afterwards, an outline of how to create a simulation (setting up the electromagnetic fields etc).
+
+\section{Directories}
+The project consists of the following directories:
+
+\begin{description}
+\item[src] Contains the source files of the project. These will be described in more detail in the next section.
+\item[headers] Contains headers needed for the source files. Every source files has its corresponding header file, with function headers for the functions that are callable \emph{outside} their source file.
+\item[output] Output files are written here by the program.
+\item[documentation] Contains the current documentation.
+\item[plot] Contains the Python plotting scripts.
+\item[obj] Contains object files (.o).
+\end{description}
+
+Also, the \emph{"input.txt"} file, in the main directory of the project, contains initial conditions for the particle (3 position coordinates and 3 velocity coordinates).
+
+\section{The Code}
+The code is contained in the \emph{src} directory, in the following source files:
+
+\begin{description}
+\item[main.c] The main source file. Reads input, allocates memory, calls the solver wrapper and finally writes the output.
+\item[fields.c] The electromagnetic field functions. Contains the Electromagnetic Force function calculator (\emph{FLorentz}), a cross product evaluating function (\emph{cross}), and functions for the user to set the Electric and Magnetic fields (\emph{EField and BField}, respectively).
+\item[motion.c] The solver wrapper function (\emph{motion}) in this file calls the solver for the required number of steps and writes output in memory for every interval requested.
+\item[solver.c] Contains the numerical solver function \emph{RK4\_ motion3D}. This function calculates the particle motion for one timestep and returns the particle with updated coordinates. The numerical method used is the \emph{4th order Runge Kutta} method.
+\item[memory.c] Contains the \emph{array2D\_ contiguous} function, that dynamically allocates a 2D array contiguously in memory and \emph{free\_ array2D\_ contiguous}, which frees memory allocated in the previous way.
+\item[io.c] Contains functions that read input from the input file and the command line, print the problem parameters to the screen and write output to memory and output files.
+\end{description}
+
+The following header files in \emph{headers/struct.h} are also of interest:
+\begin{description}
+\item[definitions.h] Contains values for particle (ion or electron) charge and mass. These are currently set to 1.0 or -1.0 respectively.
+\item[struct.h] Contains the structure definitions for the program. These are described in the next section.
+\end{description}
+\newpage
+\section{Data Structures}
+The program uses the following data structures, defined in \emph{headers/struct.h}:
+
+\begin{description}
+\item[vector3D] A 3D vector, consisting of 3 double variables, one for each coordinate. A very useful data structure for this program, vector structures are used in the \emph{particle} structure and by the \emph{field} functions in \emph{field.c}.
+\begin{lstlisting}
+struct vector3D {
+    double x;
+    double y;
+    double z;
+};
+\end{lstlisting}
+\item[particle] The main data structure of the program. Contains information about the particle whose motion is simulated. \emph{Position} and \emph{velocity} are \emph{vector structures}. Also contains the particle \emph{charge} and \emph{mass}. These could have been defined as macros, but as the program aims to be part of a Particle-In-Cell code simulating many particles (both ions and electrons), this information was included in the particle structure.
+\begin{lstlisting}
+struct particle {
+    struct vector3D r;
+    struct vector3D v;
+    double q;
+    double m;
+};
+\end{lstlisting}
+
+\item[time] A structure containing the time parameters of the program, in order to pass them in a neat way 
+to functions.
+\begin{lstlisting}
+struct time {
+  double totalTime;
+  double dt;
+  int output_interval;
+  int totalTimeSteps;
+  int nOutput;
+};
+\end{lstlisting}
+\end{description}
+\newpage
+\section{The Numerical Method}
+The program essentially solves the charged particle equations of motion, following Newton's 2nd Law formalism:
+\begin{equation}
+\frac{d^2 \overrightarrow{r}}{dt^2} = \frac{\overrightarrow{F_L}}{m}
+\end{equation}
+
+where
+\begin{equation}
+\overrightarrow{F_L} = q\left(\overrightarrow{E} + \overrightarrow{v} \times \overrightarrow{B} \right).
+\end{equation}
+
+Runge-Kutta (4th order) was chosen as the numerical method for the motion for the particle. Being a multistage method, Runge-Kutta requires the calculation of the right-hand-side of (2.1) for each of the four stages it calculates. A decision was made to write the solver function in the clearest possible way, avoiding switches and other methods that would make it more compact but much less clear.
+\newline
+
+A detailed analysis of Runge-Kutta is outside the scope of this report, but can be found in most Numerical Analysis textbooks dealing with the numerical solution of Ordinary Differential Equations, such as \cite{leveque}.
+
+\newpage
+\section{Setting Up a Simulation}
+To set up a particular problem, the user has to do the following actions:
+
+\begin{itemize}
+\item Set the desired Electric and Magnetic fields in \emph{fields.c}.
+\item Set the definitions for particle mass and charge in in \emph{headers/definitions.h}.
+\item Compile the program by typing "make".
+\item Set the desired initial conditions for the particle in \emph{"input.txt"}.
+\item Run the program, as described in the introduction, specifying the time parameters.
+\end{itemize}
+
+After running the program, output is written in the \emph{output} directory and can be visualized with the Python scripts in the \emph{plot} directory, as shown in the introduction.
+
+\chapter{Examples}
+In this chapter, a number of representative problems will be shown. A detailed analysis and study of charged particle motion is outside the scope of this report, but excellent references include \cite{goldston}, \cite{freidberg} and \cite{bellan}.
+
+\section{Simple Gyromotion}
+
+
+\section{$\bm{E} \times \bm{B}$ Drift}
+
+
+\section{Magnetic Dipole}
+
+
+\begin{thebibliography}{1}
+
+  \bibitem{leveque} Randall J. LeVeque {\em Finite Difference Methods for Ordinary and Partial Differential Equations.}  2007.
+  \bibitem{goldston} Robert J Goldston, Paul H Rutherford, {\em Introduction To Plasma Physics}  1995.
+  \bibitem{freidberg} Jeffrey Freidberg, {\em Plasma Physics and Fusion Energy}  2007.
+  \bibitem{bellan} Paul M. Bellan {\em Fundamentals of Plasma Physics}  2006.
+
+  \end{thebibliography}
+
+\end{document}

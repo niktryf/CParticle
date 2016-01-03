@@ -29,6 +29,8 @@ It provides output for position (x, y, z) and velocity
 (v_x, v_y, v_z). Kinetic energy is also provided, for testing 
 purposes.
 
+For more details regarding the code, see the documentation in "doc" 
+directory.
 
 --------------------------------------------------------------------
 ii. Compilation
@@ -36,7 +38,6 @@ ii. Compilation
 CParticle is written in C and does not use any external libraries. It 
 should compile in any linux system with a C compiler.
 To compile, use the makefile provided and simply type "make".
-See doc
 
 --------------------------------------------------------------------
 iii. Structure
@@ -47,7 +48,7 @@ Directories:
             - obj:      directory for .o files
             - plot:     python scripts for visualizing results
             - output:   output files are written here
-            - doc:      result samples, description
+            - doc:      output samples, description
 
 --------------------------------------------------------------------
 iv. Usage
