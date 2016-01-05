@@ -189,16 +189,265 @@ To set up a particular problem, the user has to do the following actions:
 After running the program, output is written in the \emph{output} directory and can be visualized with the Python scripts in the \emph{plot} directory, as shown in the introduction.
 
 \chapter{Examples}
-In this chapter, a number of representative problems will be shown. A detailed analysis and study of charged particle motion is outside the scope of this report, but excellent references include \cite{goldston}, \cite{freidberg} and \cite{bellan}.
+In this chapter, a number of representative problems will be shown. A detailed analysis and study of charged particle motion is outside the scope of this report, but excellent references include \cite{goldston}, \cite{freidberg} and \cite{bellan}. Detailed analysis of every example shown in the following sections can be found in the previous references.
 
-\section{Simple Gyromotion}
+\section{Gyromotion}
+In this section we will show the simulation results of the motion of a charged particle in a uniform magnetic field $B$, with no electric field. This motion is known as \emph{gyromotion} or \emph{cyclotron motion}, because the particle performs a circular motion around the magnetic field lines. 
+\newline
 
+One fundamental quantity of the gyromotion is the \emph{cyclotron frequency} (also known as \emph{Larmor frequency} or \emph{gyro-frequency}), which is the angular frequency of the circular motion of the particle:
 
+\begin{equation}
+\omega_c = \frac{|q|B}{m}
+\end{equation}
+
+where $q$ is the particle charge, $B$ is the magnitude of the magnetic field and $m$ the mass of the particle.
+\newline
+
+Another important quantity of the cyclotron motion is the \emph{cyclotron radius} (or \emph{gyroradius} or \emph{Larmor radius}), the radius of the circular motion of the charge:
+
+\begin{equation}
+r_c = \frac{m u_{\bot}}{|q|B}
+\end{equation}
+
+where $u_{\bot}$ is the magnitude of the particle's velocity \emph{perpendicular} to the magnetic field.
+\newline
+
+As a general rule, we expect charged particles to perform a circular motion around the magnetic field lines, with frequency as in (3.1) and radius as in (3.2). In addition, if we point our two thumbs along the direction of the magnetic field, ions rotate in the direction of our left-hand fingers, while electrons rotate in the direction of our right-hand fingers. 
+
+\subsection{Ion Gyromotion}
+We will now simulate the gyromotion of an ion in a uniform magnetic field. For simplicity, we will assume that $\bm{B} = B_0 \hat{\bm{z}}$ and that $B_0 = 1$. To do this, we go to \emph{src/fields.c} and edit the \emph{BField} function in this way:
+
+\begin{lstlisting}
+struct vector3D BField (struct vector3D r, double t)
+{
+  struct vector3D B;
+
+  B.x = 0.0;
+  B.y = 0.0;
+  B.z = 1.0;
+
+  return B;
+}
+\end{lstlisting}
+
+We also set all components of the electric field to zero (\emph{EField} function in the same source file). Finally, the ion mass and charge are set equal to $1.0$ (this can be done in \emph{headers/definitions.h}).
+\newline 
+
+We compile the program by typing \emph{"make"} in the main project directory. After our executable is ready, we can enter our desired initial conditions in \emph{input.txt}. If we want the particle's starting position to be at $r_0 = (0,0,0)$ and its initial velocity to be $v_0 = (1, 1, 1)$, we edit the input file as follows:
+
+\begin{lstlisting}
+r 0.0 0.0 0.0
+v 1.0 1.0 1.0
+\end{lstlisting}
+
+From the parameters given above, we expect a gyrofrequency 
+\begin{equation}
+\omega_c = \frac{|q|B}{m} = \frac{1 \cdot 1}{1} = 1
+\end{equation}
+
+and thus a period of the circular motion
+
+\begin{equation}
+T_c = \frac{2 \pi}{\omega_c} = \frac{2 \pi}{1} = 2 \pi
+\end{equation}
+
+and a gyroradius of 
+\begin{equation}
+r_c = \frac{m u_{\bot}}{|q|B} = \frac{1 \cdot \sqrt{u_x^2 + u_y^2}}{|1| \cdot 1}
+= \sqrt{1^2 + 1^2} = \sqrt{2} \simeq 1.414
+\end{equation}
+
+We expect a helical motion and, since we are simulating an ion (positive charge), a clockwise circular motion if we view space from the z-axis top-down.
+\newline
+
+We run the program as follows (aiming for 10 periods):
+
+\begin{lstlisting}
+./cparticle i 62.8 0.001 10
+\end{lstlisting}
+
+Once the simulation is finished, output is written in the \emph{output} directory. We can now produce some plots to visualize the output, using the Python visualization scripts in the \emph{plot} directory.
+\newline
+
+First, by running the script \emph{plot\_xyz.py} we can produce $x(t) - t$ and $v_x(t) - t$ plots. We can choose the desired components to plot, as indicated inside the script. For example, if we want to plot the $x$ component of the motion, we edit the \emph{plot\_ xyz.py} script as follows:
+
+\begin{lstlisting}
+plot1D(t, x, v_x)
+\end{lstlisting}
+
+We run the script as follows:
+
+\begin{lstlisting}
+python plot_xyz.py
+\end{lstlisting}
+
+Below we show the collected output of the program, for all components ($x, v_x$ etc) separately. Afterwards, we show the 3D plot of the trajectory. Finally, we will show the figure of the completed animation, which can be created by running the \emph{animate.py} script as follows:
+
+\begin{lstlisting}
+python animate.py
+\end{lstlisting}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gyro_ion_x}
+    \caption{$x(t)$, $v_x(t)$ plot. We see the expected sinusoidal motion of the ion along $x$. Notice that the ion completes the expected number of cyclotron periods (10) and the ion's gyroradius is the expected $r_c \simeq 1.414$.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gyro_ion_y}
+     \caption{$y(t)$, $v_y(t)$ plot. We see again the expected sinusoidal motion of the ion along $y$. The same number of cyclotron periods (10) is completed and the ion's gyroradius is the expected $r_c \simeq 1.414$.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gyro_ion_z}
+     \caption{$z(t)$, $v_z(t)$ plot. The ion's motion along  is unaffected by the magnetic field, as expected. The ion moves along $z$ with its initial, constant velocity.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gyro_ion_3d}
+     \caption{The 3D plot of the ion's trajectory. We see the expected helical motion for $\bm{B} = B_0\hat{\bm{z}}$, \emph{clockwise} (left-hand rule), as expected}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gyro_ion_3d_anim}
+     \caption{The completed animation of the ion's trajectory. The user can create the animation by running the \emph{animate.py} script.}
+\end{figure}
+
+\newpage
+
+\subsection{Electron Gyromotion}
+In this subsection we will show how to set up and run an electron's gyromotion, and the visualization results. The simulation and quantities are similar to the previous section (we are keeping $q_e = 1.0$ and $m_e = 1.0$ for simplicity). The only difference is that for an electron's gyromotion, we expect to see an anti-clockwise circular motion, viewing space from the z-axis top-down. 
+\newline
+
+We do not actually need to recompile the program. Keeping the same initial conditions in \emph{input.txt}, we run the program, simply changing $i$ to $e$, as follows:
+
+\begin{lstlisting}
+./cparticle e 62.8 0.001 10
+\end{lstlisting}
+
+We will only show the 3D trajectory plot here, due to the similarity with the ion motion shown previously.
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gyro_electron_3d}
+     \caption{The 3D plot of the electron's trajectory. We see the expected helical motion for $\bm{B} = B_0\hat{\bm{z}}$, \emph{anti-clockwise} (right-hand rule), as expected.}
+\end{figure}
+
+\newpage
 \section{$\bm{E} \times \bm{B}$ Drift}
+When a charged particle moves in uniform $\bm{E}$ and $\bm{B}$ fields, along with the gyromotion we previously saw, it exhibits what is commonly known as a \emph{drift} velocity:
 
+\begin{equation}
+\bm{v}_D = \frac{\bm{E} \times \bm{B}}{B^2}
+\end{equation}
 
-\section{Magnetic Dipole}
+In other words, this motion is identical to the gyromotion that we encountered in the previous section, plus a constant velocity $\bm{v}_D$ as shown in (3.6). In this section we will simulate this drift motion for an ion and an electron. What is interesting is the fact that ions and electrons drift in the same direction in $\bm{E}, \bm{B}$ fields. A detailed analysis $\bm{E} \times \bm{B}$ drift motion can be found in most plasma physics books; however, the analysis of \cite{freidberg} is, in my opinion, one of the clearest.
 
+\subsection{Ion Drift Motion}
+We will set the electric field along the $y$ axis and the magnetic field along the $z$ axis, for simplicity:
+
+\begin{align}
+\bm{E} & = E_0 \hat{\bm{y}} \\
+\bm{B} & = B_0 \hat{\bm{z}}\\
+E_0 = 0.1, & \quad \quad B_0 = 1.0
+\end{align}
+
+In this way, we expect the following drift velocity:
+
+\begin{equation}
+\bm{v}_D = \frac{\bm{E} \times \bm{B}}{B^2} = 0.01 \hat{\bm{x}}
+\end{equation}
+
+We set the desired electric and magnetic fields (3.7) - (3.9), in \emph{src/fields.c}:
+
+\begin{lstlisting}
+struct vector3D EField (struct vector3D r, double t)
+{
+  struct vector3D E;
+
+  E.x = 0;
+  E.y = 0.1;
+  E.z = 0;
+
+  return E;
+}
+
+struct vector3D BField (struct vector3D r, double t)
+{
+  struct vector3D B;
+
+  B.x = 0.0;
+  B.y = 0.0;
+  B.z = 1.0;
+
+  return B;
+}
+\end{lstlisting}
+
+We compile and, using the same initial conditions as in the previous section, we run the program:
+
+\begin{lstlisting}
+./cparticle i 62.8 0.001 10
+\end{lstlisting}
+
+Below we can see the visualization results of the program:
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/drift_ion_x}
+    \caption{$x(t)$, $v_x(t)$ plot. We see the sinusoidal motion of the ion along $x$, plus the expected drift velocity. Notice that the ion completes the expected number of cyclotron periods (10).}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/drift_ion_y}
+     \caption{$y(t)$, $v_y(t)$ plot. We see again the expected sinusoidal motion of the ion along $y$, without any drift motion along $y$, as expected. The same number of cyclotron periods (10) is completed.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/drift_ion_z}
+     \caption{$z(t)$, $v_z(t)$ plot. The ion's motion along  is unaffected by the magnetic field, as expected. The ion moves along $z$ with its initial, constant velocity.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/drift_ion_3d}
+     \caption{The 3D plot of the ion's trajectory. We see the expected helical motion for $\bm{B} = B_0 \hat{\bm{z}}$, drifting along the $\hat{\bm{x}}$ axis.}
+\end{figure}
+
+\newpage
+
+\subsection{Electron Drift Motion}
+In this section we will show the simulation of an electron's drift motion. We will keep everything similar with the previous section, but will simply run for an electron, as follows:
+
+\begin{lstlisting}
+./cparticle e 62.8 0.001 10
+\end{lstlisting}
+
+Below we can see the 3D trajectory of the electron (other plots are similar with those of the previous section).
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/drift_electron_3d}
+     \caption{The 3D plot of the electron's trajectory. We see the expected helical motion for $\bm{B} = B_0 \hat{\bm{z}}$, drifting along the $\hat{\bm{x}}$ axis, with the same drift velocity as the ion in the previous section.}
+\end{figure}
+
+\newpage
+
+\section{$\nabla \bm{B}$ Drift}
+(Under Construction)
+
+\section{Curvature Drift}
+(Under Construction)
+
+\section{Motion in a Magnetic Dipole Field}
+(Under Construction)
 
 \begin{thebibliography}{1}
 

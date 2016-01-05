@@ -21,7 +21,13 @@ t, x, y, z, v_x, v_y, v_z = np.loadtxt("../output/output.txt", unpack=True)
 
 # Start figure and axes
 fig = plt.figure()
-ax = fig.add_axes([0, 0, 1, 1], projection='3d', axis_bgcolor='white')
+l = 0
+b = 0
+w = 1
+h = 1
+rect = l, b, w, h
+ax = fig.add_axes(rect, projection='3d', axis_bgcolor='white')
+### Turn the axis on and off to see the orientation!
 ax.axis('off')
 
 #size of output, for number of frames
@@ -59,7 +65,8 @@ def animate(i):
     pt.set_data(xx[-1:], yy[-1:])
     pt.set_3d_properties(zz[-1:])
 
-    ax.view_init(0, 0-0.1*i)
+    # Set altitude degrees, azimuth degrees
+    ax.view_init(0, 0)
     fig.canvas.draw()
     return pt,
 

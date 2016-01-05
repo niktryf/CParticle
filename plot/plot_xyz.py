@@ -24,9 +24,9 @@ from plot import plot1D
 t, x, y, z, v_x, v_y, v_z = np.loadtxt("../output/output.txt", unpack=True)
 
 ##############################################################
-# t, x, v plot (1D) : select desired coordinates
+# t, x, v plot (1D) : select desired components to plot
 ##############################################################
-# Plot t, x (plot1d function in plot1D.py)
+# Plot t, x, v_x (plot1d function in plot1D.py)
 plot1D(t, x, v_x)
 
 ##############################################################
@@ -36,6 +36,10 @@ plot1D(t, x, v_x)
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 ax.plot(x, y, z)
+### Set axes limits here:
+ax.set_xlim3d(-2, 9)
+ax.set_ylim3d(-2, 9)
+ax.set_zlim3d(0, 80)
 ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_zlabel('z')
