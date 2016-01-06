@@ -424,13 +424,13 @@ Below we can see the visualization results of the program:
 \newpage
 
 \subsection{Electron Drift Motion}
-In this section we will show the simulation of an electron's drift motion. We will keep everything similar with the previous section, but will simply run for an electron, as follows:
+In this section we will show the simulation of an electron's drift motion. We will keep everything similar to the previous section and we will simply run for an electron, as follows:
 
 \begin{lstlisting}
 ./cparticle e 62.8 0.001 10
 \end{lstlisting}
 
-Below we can see the 3D trajectory of the electron (other plots are similar with those of the previous section).
+Below we can see the 3D trajectory of the electron (other plots are similar to those of the previous section).
 
 \begin{figure}[!ht]
   \centering
@@ -438,23 +438,151 @@ Below we can see the 3D trajectory of the electron (other plots are similar with
      \caption{The 3D plot of the electron's trajectory. We see the expected helical motion for $\bm{B} = B_0 \hat{\bm{z}}$, drifting along the $\hat{\bm{x}}$ axis, with the same drift velocity as the ion in the previous section.}
 \end{figure}
 
+\section{$\nabla \bm{B}$ Drift}
+When moving inside a non-uniform magnetic field with a gradient $\nabla B$, a charged particle also exhibits a drift, commonly known as a \emph{gradient drift}:
+
+\begin{equation}
+\bm{v}_{grad} = \pm \frac{u_{\bot}^2}{2\omega _c} \frac{\bm{B} \times \nabla B}{B^2}
+\end{equation}
+
+where the sign corresponds to the sign of the particle's charge; contrary to $\bm{E} \times \bm{B}$ drifts, in $grad-B$ drifts ions and electrons drift in opposite directions.
+\newline
+
+In this section, we will simulate the drift motion of an ion and an electron. We set up the Electric and Magnetic fields in \emph{fields.c} as follows: 
+
+\begin{lstlisting}
+struct vector3D EField (struct vector3D r, double t)
+{
+  struct vector3D E;
+
+  E.x = 0;
+  E.y = 0;
+  E.z = 0;
+
+  return E;
+}
+
+struct vector3D BField (struct vector3D r, double t)
+{
+  struct vector3D B;
+
+  B.x = 0.0;
+  B.y = 0.0;
+  B.z = r.y;
+
+  return B;
+}
+\end{lstlisting}
+
+and we start the particle from position $\bm{r}_0 = (0, 1, 0)$ and with initial velocity $\bm{v}_0 = (0.1, 0.1, 0.1)$, editing the input file \emph{input.txt} as follows:
+
+\begin{lstlisting}
+r 0.0 1.0 0.0
+v 0.1 0.1 0.1
+\end{lstlisting}
+
+These initial conditions ensure that the motion is kept simple enough for the illustration purposes of this report. With the above, we expect the following drift directions for ions and electrons, respectively:
+
+\begin{align*}
+Ions:& \quad \quad \bm{v}_D \sim -\bm{\hat{x}}\\
+Electrons:&  \quad \quad \bm{v}_D \sim +\bm{\hat{x}}
+\end{align*}
 \newpage
 
-\section{$\nabla \bm{B}$ Drift}
-(Under Construction)
+\subsection{Ion Grad-B Drift}
+We run the program as follows:
 
-\section{Curvature Drift}
-(Under Construction)
+\begin{lstlisting}
+./cparticle i 62.8 0.001 10
+\end{lstlisting}
+
+Below we can see the visualization results of the ion grad-B drift:
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gradB_ion_x}
+    \caption{$x(t)$, $v_x(t)$ plot. We see the sinusoidal motion of the ion along $x$, plus the expected drift velocity towards the negative $x$ axis.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gradB_ion_y}
+     \caption{$y(t)$, $v_y(t)$ plot. We see again the expected sinusoidal motion of the ion along $y$, without any drift motion along $y$, as expected.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gradB_ion_z}
+     \caption{$z(t)$, $v_z(t)$ plot. The ion's motion along  is unaffected by the magnetic field, as expected. The ion moves along $z$ with its initial, constant velocity.}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/gradB_ion_3d}
+     \caption{The 3D plot of the ion's trajectory in a grad-B field. We see the expected helical motion plus the drift towards the negative $x$ axis.}
+\end{figure}
+
+\newpage
 
 \section{Motion in a Magnetic Dipole Field}
-(Under Construction)
+The motion of a charged particle in a magnetic dipole field, which can be used to approximate the earth's magnetic field, is a very good example of charged particle motion. Inside a magnetic dipole field, a charged particle exhibits \emph{grad-B} and \emph{curvature B} drifts. A very good analysis and illustration of this kind of motion can be found in \cite{ozturk}.
+
+The Earth's magnetic dipole field can be expressed in cartesian coordinates as:
+
+\begin{equation}
+\bm{B}_{dip} = - \frac{B_0 R_e^3}{r^5}\left[ 3xz \bm{\hat{x}} + 3yz \bm{\hat{y}} + (2z^2 -x^2 -y^2) \bm{\hat{z}} \right]
+\end{equation}
+
+where $B_0$ is the magnitude of the magnetic field at the equator and $R_e$ is the radius of the Earth. For simplicity, we will normalize both quantities to $1.0$ for the purposes of this example.
+\newline
+
+\newpage
+We set up the magnetic field in \emph{src/fields.c} as follows, leaving the electric field set to zero:
+
+\begin{lstlisting}
+struct vector3D BField (struct vector3D r, double t)
+{
+  struct vector3D B;
+
+  B.x = -(1.0/pow(sqrt(r.x*r.x+r.y*r.y+r.z*r.z),5))*3*r.x*r.z;
+  B.y = -(1.0/pow(sqrt(r.x*r.x+r.y*r.y+r.z*r.z),5))*3*r.y*r.z;
+  B.z = -(1.0/pow(sqrt(r.x*r.x+r.y*r.y+r.z*r.z),5))
+  	     *(2*r.z*r.z-r.x*r.x-r.y*r.y);
+
+  return B;
+}
+\end{lstlisting}
+
+Afterwards, we set the initial conditions of the particle, to make sure that the particle is trapped in the magnetic field, as follows:
+
+\begin{lstlisting}
+r 0.075 0.0 0.0
+v 2.0 2.0 12.0
+\end{lstlisting}
+
+Finally, we run the program:
+
+\begin{lstlisting}
+./cparticle i 0.8 0.000001 10
+\end{lstlisting}
+
+Below we can see the 3D plot of the particle's trajectory.
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.75\textwidth]{images/earth_ion3d}
+     \caption{The 3D plot of the ion's trajectory in a magnetic dipole field (similar to Earth's). We see the helical motion around the magnetic field lines, plus $\nabla B$ drift (north-south) along with \emph{curvature} drift (east-west).}
+\end{figure}
+
+
 
 \begin{thebibliography}{1}
 
-  \bibitem{leveque} Randall J. LeVeque {\em Finite Difference Methods for Ordinary and Partial Differential Equations.}  2007.
-  \bibitem{goldston} Robert J Goldston, Paul H Rutherford, {\em Introduction To Plasma Physics}  1995.
-  \bibitem{freidberg} Jeffrey Freidberg, {\em Plasma Physics and Fusion Energy}  2007.
-  \bibitem{bellan} Paul M. Bellan {\em Fundamentals of Plasma Physics}  2006.
+  \bibitem{leveque} Randall J. LeVeque {\em Finite Difference Methods for Ordinary and Partial Differential Equations, }  2007.
+  \bibitem{goldston} Robert J Goldston, Paul H Rutherford, {\em Introduction To Plasma Physics,}  1995.
+  \bibitem{freidberg} Jeffrey Freidberg, {\em Plasma Physics and Fusion Energy,}  2007.
+  \bibitem{bellan} Paul M. Bellan {\em Fundamentals of Plasma Physics,}  2006.
+  \bibitem{ozturk} M. Kaan Ozturk, {\em Trajectories of charged particles trapped in Earth's magnetic field,}  2011.
 
   \end{thebibliography}
 
